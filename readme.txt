@@ -1,0 +1,1 @@
+Cette application web permet d'afficher des données de pollution de l'air (microparticules et co2) captées par un arduino associé à un capteur de particule fine (pm 2,5) ainsi qu'un capteur de co2.
