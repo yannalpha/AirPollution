@@ -1,11 +1,10 @@
-
+function InitialiserCarte(data) {
 // variables globales
+console.log(data);
+console.log(data[0].latitude);
 
 var maLat = 48.5;
 var maLng = 2.2;
-
-function InitialiserCarte() {
-
     // configuration de la carte
     
         
@@ -13,30 +12,25 @@ function InitialiserCarte() {
     var osmUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
     
     // recup localisation
+    var rondPF = [];
+    var rondCO2 = [];
     
+    
+    // boucle données pollution
+    for(i = 0; i < data.length; i++){
+        var lat = data[i].latitude;
+        var lon = data[i].longitude;
+        if (data[i].type == "PF")
+            rondPF.push(L.circle([lat, lon], {radius: 300, color:'red'}).bindPopup('This is Littleton, CO.'));
+        else
+            rondCO2.push(L.circle([lat, lon], {radius: 300, color:'red'}).bindPopup('This is Littleton, CO.'));
+    }
 
-
-    
-    // les marqueurs de co2
-    var rond1 = L.circle([39.61, -105.02], {radius: 300, color:'red'}).bindPopup('This is Littleton, CO.'),
-    rond2    = L.circle([39.74, -104.99], {radius: 200, color:'blue'}).bindPopup('This is Denver, CO.'),
-    rond3    = L.circle([39.73, -104.8], {radius: 150, color:'green'}).bindPopup('This is Aurora, CO.'),
-    rond4    = L.circle([39.77, -105.23], {radius: 180, color:'green'}).bindPopup('This is Golden, CO.');
-    
-    
-    // les marqueurs de micro particules
-    
-
-    var rond5 = L.circle([39.68, -105.02], {radius: 800, color:'yellow'}).bindPopup('This is Littleton, CO.'),
-    rond6    = L.circle([39.70, -104.99], {radius: 250, color:'yellow'}).bindPopup('This is Denver, CO.'),
-    rond7    = L.circle([39.80, -104.8], {radius: 650, color:'yellow'}).bindPopup('This is Aurora, CO.'),
-    rond8    = L.circle([39.66, -105.23], {radius: 210, color:'yellow'}).bindPopup('This is Golden, CO.');
-    
     
     // création des layers
     
-    var pollutionCO = L.layerGroup([rond1, rond2, rond3, rond4]);
-    var pollutionMP = L.layerGroup([rond5, rond6, rond7, rond8]);
+    var pollutionCO = L.layerGroup(rondPF);
+    var pollutionMP = L.layerGroup(rondCO2);
     
     
     // appel de la map 
@@ -44,23 +38,21 @@ function InitialiserCarte() {
     var maMap = L.map('maMap', {
         center: [maLat, maLng],
         zoom: 10,
+        maxZoom: 18,
+        minZoom: 3,
         layers: [pollutionCO, pollutionMP]
     });
-
+    console.log(maMap._zoom);
+    
+    // localisation
     if(navigator.geolocation)
     {
         navigator.geolocation.getCurrentPosition(function(position){
-                var infopos = "Position déterminée :\n";
-                infopos += "Latitude : "+position.coords.latitude +"\n";
                 maLat = position.coords.latitude;
                 maLng = position.coords.longitude;
-                infopos += "Longitude: "+position.coords.longitude+"\n";
-                infopos += "Altitude : "+position.coords.altitude +"\n";
-                document.getElementById("infoposition").innerHTML = infopos;
-                maMap.setView([maLat,maLng], 10);
+                maMap.flyTo([maLat,maLng], 10);
                 var maLocalisation = L.marker([maLat, maLng]).addTo(maMap);
-                
-            alert('localisation trouvée, vous etes chanceux!');
+                console.log('localisation trouvée, vous etes chanceux!');
         });
         
     }
@@ -68,25 +60,55 @@ function InitialiserCarte() {
     {
         alert('localisation non accessible');
     }
+
+    
+    //Zoom event
+    
+    maMap.on("zoomend", function(){
+        requestObject.zoom = maMap.getZoom();
+        console.log(requestObject);
+    });
+    
+    
+    
     
 
-
-
-    var overlayMaps = {
+    var overlayMaps ={
         "Taux de Co2": pollutionCO,
         "taux de micro particules": pollutionMP
     };
+    
     L.control.layers(overlayMaps).addTo(maMap);
 
     L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(maMap);
     
-
-};
+    // tape dans l'api
     
+    var requestObject = {
+        "zoom" :  0,
+        "lattitude" : maLat,
+        "longitude" : maLng
+    };
+    
+    
+
+    
+    
+};
 
 //// on appel la fonction
-InitialiserCarte();
+//InitialiserCarte();
 
     
 
+// rquette api
+//http://10.40.73.234:8000/app.php/api/getAll
+var data;
+$.ajax({
+    url : 'http://10.40.73.234:8000/app.php/api/getAll', // La ressource ciblée
+    type : 'GET' // Le type de la requête HTTP.
+}).done(function(data) {
+    console.log('http request : ');
+    InitialiserCarte(data);
+});
 

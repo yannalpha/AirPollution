@@ -1,6 +1,8 @@
+/********************************/
+/************ fonts *************/
+/********************************/
 
-
-
+@import url('https://fonts.googleapis.com/css?family=Bungee+Hairline');
 
 
 /********************************/
@@ -9,9 +11,6 @@
 #maMap {
     height: 70vh;
 }
-#infoposition{
-    color: white;
-}
 
 
 /********************************/
@@ -19,6 +18,7 @@
 /********************************/
 body{
     background-color: #2c3e50;
+    font-family: 'Bungee Hairline', cursive;
 }
 
 /********************************/
@@ -26,8 +26,7 @@ body{
 /********************************/
 
 main{
-    background-color: #34495e;
-    height: 450px;
+    height: auto;
     padding-top: 50px;
 }
 
@@ -38,6 +37,10 @@ header{
     display: flex;
     height: 100px;
     background-color: #2c3e50;
+    color: white;
+}
+header h1{
+    text-shadow: 0px 0px 8px green, 0px 0px 4px red;
 }
 
 
