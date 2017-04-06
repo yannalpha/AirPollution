@@ -1,5 +1,8 @@
 
 //////////////////////   configuration de la carte /////////////////////////////
+var maLat = 48.5;
+var maLng = 2.2;
+var objetMap;
 
 function initialiserCarte(){
 
@@ -16,8 +19,8 @@ function initialiserCarte(){
         navigator.geolocation.getCurrentPosition(function(position){
                 maLat = position.coords.latitude;
                 maLng = position.coords.longitude;
-                maMap.flyTo([maLat,maLng], 10);
-                var maLocalisation = L.marker([maLat, maLng]).addTo(maMap);
+                objetMap.flyTo([maLat,maLng], 10);
+                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap);
                 console.log('localisation trouvée, vous etes chanceux!');
         });
 
@@ -29,17 +32,17 @@ function initialiserCarte(){
 
 
 
-    var maMap = L.map('maMap', {
+    objetMap = L.map('maMap', {
         center: [maLat, maLng],
         zoom: 10,
         maxZoom: 18,
         minZoom: 3,
     });
+    
 
     //Zoom event
-    maMap.on("zoomend", function(){
-        requestObject.zoom = maMap.getZoom();
-        console.log(requestObject);
+    objetMap.on("zoomend", function(){
+        requestObject.zoom = objetMap.getZoom();
     });
 
     // tape dans l'api
@@ -50,7 +53,7 @@ function initialiserCarte(){
         "longitude" : maLng
     };
 
-    L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(maMap);
+    L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(objetMap);
 };
 
 initialiserCarte();
@@ -58,12 +61,9 @@ initialiserCarte();
 
 /////////////////////  fonction requette http ///////////////////////
 
-function requetteHttp(data) {
-    // variables globales
-    console.log(data);
-    console.log(data[0].latitude);
-
+function definitionDonnees(data) {
     
+    // variables globales
     var rondPF = [];
     var rondCO2 = [];
     
@@ -85,40 +85,13 @@ function requetteHttp(data) {
     var pollutionMP = L.layerGroup(rondCO2);
     
     
-    // appel de la map 
-    
-    var maMap = L.map('maMap', {
-        center: [maLat, maLng],
-        zoom: 10,
-        maxZoom: 18,
-        minZoom: 3,
-        layers: [pollutionCO, pollutionMP]
-    });
-    console.log(maMap._zoom);
-    
-
-
-    
-
-    
-    
-    
-    
-
+    console.log(Object.keys(objetMap["_layers"]));
     var overlayMaps ={
         "Taux de Co2": pollutionCO,
         "taux de micro particules": pollutionMP
     };
     
-    L.control.layers(overlayMaps).addTo(maMap);
-
-   
-    
-
-    
-    
-
-    
+    L.control.layers(overlayMaps).addTo(objetMap);
     
 };
 
@@ -135,10 +108,8 @@ $.ajax({
     crossDomain: true,
 //    dataType: 'jsonp'
 }).done(function(data) {
-    console.log(data);
     //// on appel la fonction
-
-    requetteHttp(data);
+    definitionDonnees(data);
 });
 
 
