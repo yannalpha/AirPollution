@@ -1,10 +1,10 @@
 function InitialiserCarte(data) {
-// variables globales
-console.log(data);
-console.log(data[0].latitude);
+    // variables globales
+    console.log(data);
+    console.log(data[0].latitude);
 
-var maLat = 48.5;
-var maLng = 2.2;
+    var maLat = 48.5;
+    var maLng = 2.2;
     // configuration de la carte
     
         
@@ -106,9 +106,12 @@ var maLng = 2.2;
 var data;
 $.ajax({
     url : 'http://10.40.73.234:8000/app.php/api/getAll', // La ressource ciblée
-    type : 'GET' // Le type de la requête HTTP.
+    type : 'GET', // Le type de la requête HTTP.
+    crossDomain: true,
+//    dataType: 'jsonp'
 }).done(function(data) {
-    console.log('http request : ');
+    console.log(data);
     InitialiserCarte(data);
 });
+
 
