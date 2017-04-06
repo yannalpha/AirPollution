@@ -1,17 +1,69 @@
-function InitialiserCarte(data) {
+
+//////////////////////   configuration de la carte /////////////////////////////
+
+function initialiserCarte(){
+
+    var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
+    var osmUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
+
+
+    var maLat = 48.5;
+    var maLng = 2.2;
+
+    // localisation 
+    if(navigator.geolocation)
+    {
+        navigator.geolocation.getCurrentPosition(function(position){
+                maLat = position.coords.latitude;
+                maLng = position.coords.longitude;
+                maMap.flyTo([maLat,maLng], 10);
+                var maLocalisation = L.marker([maLat, maLng]).addTo(maMap);
+                console.log('localisation trouvée, vous etes chanceux!');
+        });
+
+    }
+    else
+    {
+        alert('localisation non accessible');
+    }
+
+
+
+    var maMap = L.map('maMap', {
+        center: [maLat, maLng],
+        zoom: 10,
+        maxZoom: 18,
+        minZoom: 3,
+    });
+
+    //Zoom event
+    maMap.on("zoomend", function(){
+        requestObject.zoom = maMap.getZoom();
+        console.log(requestObject);
+    });
+
+    // tape dans l'api
+    
+    var requestObject = {
+        "zoom" :  0,
+        "lattitude" : maLat,
+        "longitude" : maLng
+    };
+
+    L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(maMap);
+};
+
+initialiserCarte();
+
+
+/////////////////////  fonction requette http ///////////////////////
+
+function requetteHttp(data) {
     // variables globales
     console.log(data);
     console.log(data[0].latitude);
 
-    var maLat = 48.5;
-    var maLng = 2.2;
-    // configuration de la carte
     
-        
-    var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
-    var osmUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
-    
-    // recup localisation
     var rondPF = [];
     var rondCO2 = [];
     
@@ -44,30 +96,10 @@ function InitialiserCarte(data) {
     });
     console.log(maMap._zoom);
     
-    // localisation
-    if(navigator.geolocation)
-    {
-        navigator.geolocation.getCurrentPosition(function(position){
-                maLat = position.coords.latitude;
-                maLng = position.coords.longitude;
-                maMap.flyTo([maLat,maLng], 10);
-                var maLocalisation = L.marker([maLat, maLng]).addTo(maMap);
-                console.log('localisation trouvée, vous etes chanceux!');
-        });
-        
-    }
-    else
-    {
-        alert('localisation non accessible');
-    }
+
 
     
-    //Zoom event
-    
-    maMap.on("zoomend", function(){
-        requestObject.zoom = maMap.getZoom();
-        console.log(requestObject);
-    });
+
     
     
     
@@ -80,15 +112,9 @@ function InitialiserCarte(data) {
     
     L.control.layers(overlayMaps).addTo(maMap);
 
-    L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(maMap);
+   
     
-    // tape dans l'api
-    
-    var requestObject = {
-        "zoom" :  0,
-        "lattitude" : maLat,
-        "longitude" : maLng
-    };
+
     
     
 
@@ -96,8 +122,7 @@ function InitialiserCarte(data) {
     
 };
 
-//// on appel la fonction
-//InitialiserCarte();
+
 
     
 
@@ -111,7 +136,9 @@ $.ajax({
 //    dataType: 'jsonp'
 }).done(function(data) {
     console.log(data);
-    InitialiserCarte(data);
+    //// on appel la fonction
+
+    requetteHttp(data);
 });
 
 
