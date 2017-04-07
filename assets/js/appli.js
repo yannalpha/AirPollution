@@ -3,24 +3,53 @@
 var maLat;
 var maLng;
 var objetMap;
-
+var layerMap;
 
 
 // param et création carte
 function initialiserCarte(){
 
     var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
-    var osmUrl = 'http://{s}.tile.osm.org/{z}/{x}/{y}.png';
+    
+    var osmBase = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+    var osm2 = 'http://{s}.tile3.opencyclemap.org/landscape/{z}/{x}/{y}.png';
+    var osm3 = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
+    var osm4 = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg';
 
-
-    var maLat = 48.5;
-    var maLng = 2.2;
+    maLat = 48.5;
+    maLng = 2.2;
+    
+    
+    
+    //Layers Control
+    
+    var layerBase = L.tileLayer(osmBase, {attribution: attribution,maxZoom: 50,});
+    var layer2 = L.tileLayer(osm2, {attribution: attribution,maxZoom: 50,});
+    var layer3 = L.tileLayer(osm3, {attribution: attribution,maxZoom: 50,});
+    var layer4 = L.tileLayer(osm4, {attribution: attribution,maxZoom: 50,});
+    
+    
+    
+    
+    
     objetMap = L.map('maMap', {
         center: [maLat, maLng],
         zoom: 10,
         maxZoom: 18,
         minZoom: 3,
+        layers: [layerBase]
     });
+    
+    
+    layerMap = {
+        "layerBase": layerBase,
+        "layer2": layer2,
+        "layer3": layer3,
+        "layer4": layer4,
+    }
+    
+    
+    
     console.log(objetMap.getBounds());
     
 
@@ -30,7 +59,7 @@ function initialiserCarte(){
         console.log(zoomActuel);
     });
 
-    L.tileLayer(osmUrl, {attribution: attribution,maxZoom: 50,}).addTo(objetMap);
+
 };
 
 
@@ -125,6 +154,7 @@ function testLayer(){
         [49.5546, 2.7, 300],
         [49.5587, 2.75, 321],
     ];
+    //layer group
     rondTestPoints.push(L.heatLayer(testPoints)); // TEST
     var layerTest = L.layerGroup(rondTestPoints);
 
@@ -190,32 +220,34 @@ function definitionDonnees(data) {
         }
 
     }
-    rondPF.push(L.heatLayer(pfPoints)); // on regroupe les points dans un layer
-    rondCO2.push(L.heatLayer(co2Points));
     
-    // création des layers
+    //Layer Groups
     
-    var pollutionCO = L.layerGroup(rondPF);
-    var pollutionMP = L.layerGroup(rondCO2);
+    rondPF.push(L.heatLayer(pfPoints, {blur: 25})); // on regroupe les points dans un layer
+    rondCO2.push(L.heatLayer(co2Points, {blur: 30}));
+    
+    // layer group class
+    
+    var pollutionMP = L.layerGroup(rondPF);
+    var pollutionCO = L.layerGroup(rondCO2);
 
 
     console.log(Object.keys(objetMap["_layers"]));
     var overlayMaps ={
         "Taux de Co2": pollutionCO,
-        "taux de micro particules": pollutionMP,
+        "taux de micro particules": pollutionMP
     };
-    
-    L.control.layers(overlayMaps).addTo(objetMap);
+    L.control.layers(layerMap, overlayMaps).addTo(objetMap);
 };
 
 
 
-function requetteAjax(){
+function requeteAjax(){
     // rquette api
     //http://10.40.73.234:8000/app.php/api/getAll
     var data;
     $.ajax({
-        url : 'http://10.40.73.234:8000/app.php/api/getAll', // La ressource ciblée
+        url : 'http://cgportfolio.ddns.net/api/getAll', // La ressource ciblée
         type : 'GET', // Le type de la requête HTTP.
         crossDomain: true,
     //    dataType: 'jsonp'
@@ -230,6 +262,10 @@ function requetteAjax(){
 
 
 initialiserCarte();
-testLayer();
-maLocalisation();
-requetteAjax();
+//testLayer();
+
+requeteAjax();
+
+jQuery('#maLocation').click(function (e) {
+    maLocalisation();
+});
