@@ -1,9 +1,30 @@
+/// la requette :
+// center --> lat et long
+// delta lat
+// delta long
+// type
+
+
+
+
 
 //////////////////////   configuration de la carte /////////////////////////////
+//Lattittude et longitude + delta
 var maLat;
 var maLng;
+
+
+// map and objetmap
 var objetMap;
 var layerMap;
+
+// creation layer group heatmap vide
+var co2LayerGroup = L.layerGroup();
+var pfLayerGroup = L.layerGroup();
+
+
+
+
 
 
 // param et création carte
@@ -15,11 +36,12 @@ function initialiserCarte(){
     var osm2 = 'http://{s}.tile3.opencyclemap.org/landscape/{z}/{x}/{y}.png';
     var osm3 = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
     var osm4 = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg';
+    var osm5 = 'http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
+    var osm6 = 'http://tile.stamen.com/toner/{z}/{x}/{y}.png';
+    var osm7 = 'http://tile.stamen.com/burningmap/{z}/{x}/{y}.png';
 
     maLat = 48.5;
     maLng = 2.2;
-    
-    
     
     //Layers Control
     
@@ -27,11 +49,11 @@ function initialiserCarte(){
     var layer2 = L.tileLayer(osm2, {attribution: attribution,maxZoom: 50,});
     var layer3 = L.tileLayer(osm3, {attribution: attribution,maxZoom: 50,});
     var layer4 = L.tileLayer(osm4, {attribution: attribution,maxZoom: 50,});
+    var layer5 = L.tileLayer(osm5, {attribution: attribution,maxZoom: 50,});
+    var layer6 = L.tileLayer(osm6, {attribution: attribution,maxZoom: 50,});
+    var layer7 = L.tileLayer(osm7, {attribution: attribution,maxZoom: 50,});
     
-    
-    
-    
-    
+
     objetMap = L.map('maMap', {
         center: [maLat, maLng],
         zoom: 10,
@@ -39,134 +61,30 @@ function initialiserCarte(){
         minZoom: 3,
         layers: [layerBase]
     });
-    
-    
+
     layerMap = {
-        "layerBase": layerBase,
+        "greymap": layerBase,
         "layer2": layer2,
         "layer3": layer3,
         "layer4": layer4,
+        "terrain": layer5,
+        "toner": layer6,
+        "fire": layer7,
     }
     
-    
-    
-    console.log(objetMap.getBounds());
-    
-
-    //Zoom event
-    objetMap.on("zoomend", function(){
-        zoomActuel = objetMap.getZoom();
-        console.log(zoomActuel);
-    });
-
-
-};
-
-
-
-
-
-
-
-
-
-
-
-// layer de test au cas ou conection http rejetée
-function testLayer(){
-    
-    var rondTestPoints = [];
-    var testPoints = [
-        [48.545, 2.555, 16],
-        [48.58, 2.51, 20],
-        [48.50, 2.52, 15],
-        [48.51, 2.53, 38],
-        [48.53, 2.54, 5],
-        [48.45, 2.56, 2],
-        [48.48, 2.57, 25],
-        [48.485, 2.58, 78],
-        [48.486, 2.59, 50],
-        [48.487, 2.591, 21],
-        [48.486, 2.592, 100],
-        [48.512, 2.593, 75],
-        [48.513, 2.594, 55],
-        [48.514, 2.595, 4],
-        [48.5146, 2.596, 8],
-        [48.5148, 2.597, 20],
-        [48.52, 2.598, 23],
-        [48.521, 2.599, 41],
-        [48.523, 2.5991, 23],
-        [48.524, 2.5992, 17],
-        [48.5245, 2.5993, 33],
-        [48.5249, 2.5994, 12],
-        [48.53, 2.5995, 157],
-        [48.531, 2.5996, 28],
-        [48.532, 2.5997, 6],
-        [48.533, 2.5998, 8],
-        [48.5333, 2.6, 46],
-        [48.534, 2.61, 50],
-        [48.54568, 2.62, 99],
-        [48.5457, 2.63, 51],
-        [48.5454, 2.64, 16],
-        [48.5465, 2.65, 79],
-        [48.5447, 2.66, 126],
-        [48.5457, 2.67, 114],
-        [48.5456789, 2.68, 250],
-        [48.554, 2.69, 255],
-        [48.5546, 2.7, 300],
-        [48.5587, 2.75, 321],
-        [50, 2.555, 16],
-        [49, 2.51, 20],
-        [49.3, 2.52, 15],
-        [49.51, 2.53, 38],
-        [49.53, 2.54, 5],
-        [49.45, 2.56, 2],
-        [49.48, 2.57, 25],
-        [49.485, 2.58, 78],
-        [49.486, 2.59, 50],
-        [49.487, 2.591, 21],
-        [49.486, 2.592, 100],
-        [49.512, 2.593, 75],
-        [49.513, 2.594, 55],
-        [49.514, 2.595, 4],
-        [49.5146, 2.596, 8],
-        [49.5148, 2.597, 20],
-        [49.52, 2.598, 23],
-        [49.521, 2.599, 41],
-        [49.523, 2.5991, 23],
-        [49.524, 2.5992, 17],
-        [49.5245, 2.5993, 33],
-        [49.5249, 2.5994, 12],
-        [49.53, 2.5995, 157],
-        [49.531, 2.5996, 28],
-        [49.532, 2.5997, 6],
-        [49.533, 2.5998, 8],
-        [49.5333, 2.6, 46],
-        [49.534, 2.61, 50],
-        [49.54568, 2.62, 99],
-        [49.5457, 2.63, 51],
-        [49.5454, 2.64, 16],
-        [49.5465, 2.65, 79],
-        [49.5447, 2.66, 126],
-        [49.5457, 2.67, 114],
-        [49.5456789, 2.68, 250],
-        [49.554, 2.69, 255],
-        [49.5546, 2.7, 300],
-        [49.5587, 2.75, 321],
-    ];
-    //layer group
-    rondTestPoints.push(L.heatLayer(testPoints)); // TEST
-    var layerTest = L.layerGroup(rondTestPoints);
+    // initialisation d'overlay (filtre a cocher) via layer vide
+    var overlayMaps = {
+        "Taux de Co2": co2LayerGroup,
+        "taux de micro particules": pfLayerGroup
+    };
 
     console.log(Object.keys(objetMap["_layers"]));
-    var overlayMaps ={
-        "test de layer": layerTest
-    };
+    L.control.layers(layerMap, overlayMaps).addTo(objetMap);
     
-    L.control.layers(overlayMaps).addTo(objetMap);
-
-
 };
+
+
+
 
 
 //// localisation
@@ -179,7 +97,7 @@ function maLocalisation(){
                 maLat = position.coords.latitude;
                 maLng = position.coords.longitude;
                 objetMap.flyTo([maLat,maLng], 10);
-                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap);
+                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap).bindPopup('Vous ètes ici !').openPopup();
                 console.log('localisation trouvée, vous etes chanceux!');
         });
 
@@ -192,18 +110,13 @@ function maLocalisation(){
 
 
 
-
 /////////////////////  fonction requette http ///////////////////////
 
 function definitionDonnees(data) {
     
     // variables globales
-    var rondPF = [];
-    var rondCO2 = [];
     var pfPoints = [];
     var co2Points = [];
-    
-    
     
     // boucle données pollution
     for(i = 0; i < data.length; i++){
@@ -211,43 +124,37 @@ function definitionDonnees(data) {
         var lon = data[i].longitude;
         var valeur = data[i].valeur/100;
         
-        if (data[i].type == "PF"){
-            pfPoints.push([lat,lon,valeur]); // on boucle sur les points pour les mettre dans un tableau  
-        }
-        else{
+        // on boucle sur les points pour les mettre dans un tableau
+        if (data[i].type == "PF")
+            pfPoints.push([lat,lon,valeur]);
+        else
             co2Points.push([lat,lon,valeur]);
-               
-        }
 
     }
     
     //Layer Groups
     
-    rondPF.push(L.heatLayer(pfPoints, {blur: 25})); // on regroupe les points dans un layer
-    rondCO2.push(L.heatLayer(co2Points, {blur: 30}));
-    
     // layer group class
     
-    var pollutionMP = L.layerGroup(rondPF);
-    var pollutionCO = L.layerGroup(rondCO2);
-
-
-    console.log(Object.keys(objetMap["_layers"]));
-    var overlayMaps ={
-        "Taux de Co2": pollutionCO,
-        "taux de micro particules": pollutionMP
-    };
-    L.control.layers(layerMap, overlayMaps).addTo(objetMap);
+    co2LayerGroup.addLayer(L.heatLayer(co2Points, {blur: 30}));
+    pfLayerGroup.addLayer(L.heatLayer(pfPoints, {blur: 25}));
+    
+    
+    
 };
 
 
 
-function requeteAjax(){
+
+///////////// La requette ajax
+
+
+function requeteAjax(requestUrl){
     // rquette api
     //http://10.40.73.234:8000/app.php/api/getAll
     var data;
     $.ajax({
-        url : 'http://cgportfolio.ddns.net/api/getAll', // La ressource ciblée
+        url : requestUrl, // La ressource ciblée
         type : 'GET', // Le type de la requête HTTP.
         crossDomain: true,
     //    dataType: 'jsonp'
@@ -256,11 +163,11 @@ function requeteAjax(){
         console.log("mes datas :  ")
         console.log(data);
         definitionDonnees(data);
-    }); 
+    });
 };
 
 
-
+/// la fonction recherche
 
 function mapSearch(){
     var search = L.Control.extend({
@@ -300,13 +207,55 @@ function mapSearch(){
         group.addLayer(marker);
       });
 
-      group.addTo(objetMap);
+      group.addTo(objetMap).bindPopup('une de vos recherches').openPopup();
       objetMap.fitBounds(group.getBounds());
 
     });
 }
 
 
+//Zoom & move event, on genere le delta lat et long
+function actionEvent(action){
+    objetMap.on(action, function(){
+        zoomActuel = objetMap.getZoom();
+        
+        var centerMapLat = objetMap.getCenter().lat;
+        var centerMapLong = objetMap.getCenter().lng;
+
+        var lattitudeNordEst = objetMap.getBounds()["_northEast"]["lat"];
+        var longitudeNordEst = objetMap.getBounds()["_northEast"]["lng"];
+
+        var lattitudeSouthWest = objetMap.getBounds()["_southWest"]["lat"];
+        var longitudeSouthWest = objetMap.getBounds()["_southWest"]["lng"];
+
+        var dLat = (lattitudeNordEst - lattitudeSouthWest)/2 ;
+
+        var dLong = (longitudeNordEst - longitudeSouthWest)/2;
+        
+        co2LayerGroup.eachLayer(function(layer){
+            co2LayerGroup.removeLayer(layer);
+        });
+        
+        pfLayerGroup.eachLayer(function(layer){
+            pfLayerGroup.removeLayer(layer);
+        });
+        
+        /*objetMap.eachLayer(function(layer){
+            if (layer._heat)
+                objetMap.removeLayer(layer);
+        });*/
+        
+        var requestUrl = 'http://cgportfolio.ddns.net/api/getBy' +
+                        '?lat=' + centerMapLat +
+                        '&long=' + centerMapLong +
+                        '&dLat=' + dLat +
+                        '&dLong=' + dLong;
+        
+        requeteAjax(requestUrl);
+        //requeteAjax('http://cgportfolio.ddns.net/api/getAll');
+
+    });
+};
 
 
 
@@ -316,10 +265,24 @@ function mapSearch(){
 
 
 
+// on initialise la carte
 initialiserCarte();
-//testLayer();
-requeteAjax();
+
+// on fait la premier requette ajax
+requeteAjax('http://cgportfolio.ddns.net/api/getAll');
+
+// au clic sur "me localiser"
 jQuery('#maLocation').click(function (e) {
     maLocalisation();
 });
+
+// la fonction de recherche
 mapSearch();
+
+// action au event zoom and move
+actionEvent("moveend");
+
+
+
+
+
