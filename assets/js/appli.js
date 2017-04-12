@@ -216,13 +216,13 @@ function definitionDonnees(data) {
 function getDeltaLat() {
     var lattitudeNordEst = objetMap.getBounds()._northEast.lat;
     var lattitudeSouthWest = objetMap.getBounds()._southWest.lat;
-    return (lattitudeNordEst-lattitudeSouthWest)/2;
+    return (lattitudeNordEst-lattitudeSouthWest)*0.55;
 }
 
 function getDeltaLong() {
     var longitudeNordEst = objetMap.getBounds()._northEast.lng;
     var longitudeSouthWest = objetMap.getBounds()._southWest.lng;
-    return (longitudeNordEst-longitudeSouthWest)/2;
+    return (longitudeNordEst-longitudeSouthWest)*0.55; 
 }
 
 
