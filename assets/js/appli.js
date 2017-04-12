@@ -233,8 +233,8 @@ actionEvent("moveend");
 
 // initialisation des datepickers
 jQuery(function() {
-    jQuery(".datepicker-debut").datepicker();
-    jQuery(".datepicker-fin").datepicker();
+    jQuery(".datepicker-debut").datetimepicker();
+    jQuery(".datepicker-fin").datetimepicker();
 });
 
 // au clic sur "me localiser"

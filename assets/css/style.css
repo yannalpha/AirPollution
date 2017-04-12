@@ -76,6 +76,8 @@ footer{
 /********** Date picker ********/
 
 .datepicker{
+    display: flex;
+    align-items: center;
     z-index: 10;
     height: 25px;
     background-color: #2980b9;
