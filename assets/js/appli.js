@@ -1,18 +1,21 @@
-/***************************************************************************************************/ 
-/*************************** Variables Globales ****************************************************/
-/***************************************************************************************************/
+/******************************************************************************/ 
+/***************************** Variables Globales *****************************/
+/******************************************************************************/
 
-//Lattittude et longitude + delta
+// lattittude et longitude + delta
 var maLat;
 var maLng;
 
+// nom des types de données
+var typeCo2 = "CO2";
+var typePf = "PF";
 
 // map and objetmap
 var objetMap;
 
 // nom des overlays
-var overlayCo2 = "Taux de Co2";
-var overlayPf = "Taux de micro particules";
+var overlayCo2 = "Taux de CO2";
+var overlayPf = "Taux de particules fines";
 
 // booléens d'actiovation des overlays
 var isCo2Active = false;
@@ -27,13 +30,10 @@ var co2LayerGroup = L.layerGroup();
 var pfLayerGroup = L.layerGroup();
 
 
+/******************************************************************************/ 
+/************************* Initialisation de la carte *************************/
+/******************************************************************************/ 
 
-
-
-
-/***************************************************************************************************/
-/*********************** initialisation de la carte ************************************************/
-/***************************************************************************************************/
 function initialiserCarte() {
 
     var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
@@ -49,7 +49,7 @@ function initialiserCarte() {
     maLat = 48.5;
     maLng = 2.2;
     
-    /****************************** controle des layers ******************************************/
+    /*************************** controle des layers ***************************/
     
     var layerBase = L.tileLayer(osmBase, {attribution: attribution,maxZoom: 50,});
     var layer2 = L.tileLayer(osm2, {attribution: attribution,maxZoom: 50,});
@@ -84,33 +84,28 @@ function initialiserCarte() {
         [overlayPf]: pfLayerGroup
     };
     L.control.layers(layerMap, overlayMaps).addTo(objetMap);
-
-    // on initialise les datepickers 
-    jQuery(".datetimepicker-debut").datetimepicker();
-    jQuery(".datetimepicker-fin").datetimepicker();
     
-    // action au event zoom and move
+    // actions au events
     initActionEvents();
     
 };
 
-/***************************************************************************************************/
-/**************************** Zoom & move event ****************************************************/
-/********************* on genere le delta lat et long **********************************************/
-/***************************************************************************************************/
 
+/******************************************************************************/
+/*********************************** Events ***********************************/
+/******************************************************************************/
 
-function initActionEvents(){
+function initActionEvents() {
     objetMap.on('overlayadd', function(e) {
         if (e.name && e.name == overlayPf) {
             isPfActive = true;
             if (isPfEmpty)
-                getParticulesFines();
+                getAirPollution([typePf]);
         }
         else if (e.name && e.name == overlayCo2) {
             isCo2Active = true;
             if (isCo2Empty)
-                getCo2();
+                getAirPollution([typeCo2]);
         }
     }).on('overlayremove', function(e) {
         if (e.name && e.name == overlayPf)
@@ -118,106 +113,75 @@ function initActionEvents(){
         else if (e.name && e.name == overlayCo2)
             isCo2Active = false;
     }).on("moveend", function(){
-
         if (!isCo2Empty) {
             co2LayerGroup.eachLayer(function(layer){
                 co2LayerGroup.removeLayer(layer);
             });
             isCo2Empty = true;
         }
-
         if (!isPfEmpty) {
             pfLayerGroup.eachLayer(function(layer){
                 pfLayerGroup.removeLayer(layer);
             });
             isPfEmpty = true;
         }
-        
         if (isCo2Active && isPfActive)
-            getParticulesFinesAndCo2();
+            getAirPollution([typePf, typeCo2]);
         else if (isCo2Active)
-            getCo2();
+            getAirPollution([typeCo2]);
         else if (isPfActive)
-            getParticulesFines();
-
+            getAirPollution([typePf]);
     });
 };
 
 
-/***************************************************************************************************/
-/****************************** Requettes ajax *****************************************************/
-/***************************************************************************************************/
-function getParticulesFines() {
+/******************************************************************************/
+/******************************** Requête ajax ********************************/
+/******************************************************************************/
+
+function getAirPollution(types) {
+    $.ajax({
+        url : getAirPollutionAjaxRequest(types),
+        type : 'GET',
+        crossDomain: true
+    }).done(function(data) {
+        console.log(data.length);
+        setTypeEmplyBoolean(types, false);
+        definitionDonnees(data);
+    }).fail(function(err) {
+        setTypeEmplyBoolean(types, false);
+    });
+}
+
+function setTypeEmplyBoolean(types, value) {
+    for (var i=0; i<types.length; i++) {
+        if (types[i] == typePf)
+            isPfEmpty = value;
+        else if (types[i] == typeCo2)
+            isCo2Empty = value;
+    }
+}
+
+function getAirPollutionAjaxRequest(types) {
     var requestUrl =
         'http://cgportfolio.ddns.net/api/getBy' +
         '?lat=' + objetMap.getCenter().lat +
         '&long=' + objetMap.getCenter().lng +
         '&dLat=' + getDeltaLat() +
-        '&dLong=' + getDeltaLong() + 
-        '&type=PF';
-    // rquette api
-    $.ajax({
-        url : requestUrl, // La ressource ciblée
-        type : 'GET', // Le type de la requête HTTP.
-        crossDomain: true
-    }).done(function(data) {
-        console.log(data.length);
-        isPfEmpty = false;
-        definitionDonnees(data);
-    }).fail(function(err) {
-        isPfEmpty = true;
-    });
-};
-
-///////////// La requette ajax
-function getCo2() {
-    var requestUrl = 
-        'http://cgportfolio.ddns.net/api/getBy' +
-        '?lat=' + objetMap.getCenter().lat +
-        '&long=' + objetMap.getCenter().lng +
-        '&dLat=' + getDeltaLat() +
-        '&dLong=' + getDeltaLong() + 
-        '&type=CO2';
-    // rquette api
-    $.ajax({
-        url : requestUrl, // La ressource ciblée
-        type : 'GET', // Le type de la requête HTTP.
-        crossDomain: true
-    }).done(function(data) {
-        console.log(data.length);
-        isCo2Empty = false;
-        definitionDonnees(data);
-    }).fail(function(err) {
-        isCo2Empty = true;
-    });
-};
-
-///////////// La requette ajax
-function getParticulesFinesAndCo2() {
-    var requestUrl = 
-        'http://cgportfolio.ddns.net/api/getBy' +
-        '?lat=' + objetMap.getCenter().lat +
-        '&long=' + objetMap.getCenter().lng +
-        '&dLat=' + getDeltaLat() +
         '&dLong=' + getDeltaLong();
-    // rquette api
-    $.ajax({
-        url : requestUrl, // La ressource ciblée
-        type : 'GET', // Le type de la requête HTTP.
-        crossDomain: true
-    }).done(function(data) {
-        console.log(data.length);
-        isPfEmpty = isCo2Empty = false;
-        definitionDonnees(data);
-    }).fail(function(err) {
-        isPfEmpty = isCo2Empty = true;
-    });
-};
+
+    if (types.length == 2)
+        return requestUrl;
+    else if (type[0] == typePf)
+        return requestUrl + '&type=' + typePf;
+    else if (type[0] == typeCo2)
+        return requestUrl + '&type=' + typeCo2;
+}
 
 
-/***************************************************************************************************/
-/************************ ajout des données dans calque ********************************************/
-/***************************************************************************************************/
+/******************************************************************************/
+/*************************** Ajout data dans calque ***************************/
+/******************************************************************************/
 
 function definitionDonnees(data) {
     
@@ -232,9 +196,9 @@ function definitionDonnees(data) {
         var valeur = data[i].valeur/100;
         
         // on boucle sur les points pour les mettre dans un tableau
-        if (data[i].type == "PF")
+        if (data[i].type == typePf)
             pfPoints.push([lat,lon,valeur]);
-        else
+        else if (data[i].type == typeCo2)
             co2Points.push([lat,lon,valeur]);
 
     }
@@ -245,10 +209,9 @@ function definitionDonnees(data) {
 };
 
 
-/***************************************************************************************************/
-/******************** fonctions de delta lat et long ***********************************************/
-/***************************************************************************************************/
-
+/******************************************************************************/
+/*********************** Fonctions de delta lat et long ***********************/
+/******************************************************************************/
 
 function getDeltaLat() {
     var lattitudeNordEst = objetMap.getBounds()._northEast.lat;
@@ -263,10 +226,11 @@ function getDeltaLong() {
 }
 
 
-/***************************************************************************************************/
-/**************************** l'onglet recherche ***************************************************/
-/***************************************************************************************************/
-function mapSearch(){
+/******************************************************************************/
+/****************************** Onglet recherche ******************************/
+/******************************************************************************/
+
+function mapSearch() {
     
     var input = document.getElementById("searchBox");
     var searchBox = new google.maps.places.SearchBox(input);
@@ -274,47 +238,35 @@ function mapSearch(){
     searchBox.addListener('places_changed', function() {
       var places = searchBox.getPlaces();
 
-      if (places.length == 0) {
+      if (places.length == 0)
         return;
-      }
 
       var group = L.featureGroup();
 
       places.forEach(function(place) {
-
         // Create a marker for each place.
         console.log(places);
         console.log(place.geometry.location.lat() + " / " + place.geometry.location.lng());
         var marker = L.marker([
-          place.geometry.location.lat(),
-          place.geometry.location.lng()
+            place.geometry.location.lat(),
+            place.geometry.location.lng()
         ]);
         group.addLayer(marker);
       });
 
       group.addTo(objetMap).bindPopup('une de vos recherches').openPopup();
       objetMap.fitBounds(group.getBounds());
-
     });
+
 }
 
 
-
-// on initialise la carte
-initialiserCarte();
-
-// la fonction de recherche
-mapSearch();
-
-
-/***************************************************************************************************/
-/******************************* localisation ******************************************************/
-/***************************************************************************************************/
+/******************************************************************************/
+/******************************** Localisation ********************************/
+/******************************************************************************/
 
 jQuery('#maLocation').click(function(e) {
-        // localisation 
-    if(navigator.geolocation)
-    {
+    if(navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position){
                 maLat = position.coords.latitude;
                 maLng = position.coords.longitude;
@@ -328,5 +280,13 @@ jQuery('#maLocation').click(function(e) {
 });
 
 
+// On initialise la carte
+initialiserCarte();
 
+// La fonction de recherche
+mapSearch();
+
+// On initialise les datetimepickers 
+jQuery(".datetimepicker-debut").datetimepicker();
+jQuery(".datetimepicker-fin").datetimepicker();
 
