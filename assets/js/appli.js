@@ -84,6 +84,7 @@ function initialiserCarte(){
     
 };
 
+
 ///////////// La requette ajax
 function requeteAjax(requestUrl){
     // rquette api
@@ -229,6 +230,12 @@ mapSearch();
 
 // action au event zoom and move
 actionEvent("moveend");
+
+// initialisation des datepickers
+jQuery(function() {
+    jQuery(".datepicker-debut").datepicker();
+    jQuery(".datepicker-fin").datepicker();
+});
 
 // au clic sur "me localiser"
 jQuery('#maLocation').click(function(e) {

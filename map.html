@@ -2,12 +2,17 @@
 <html>
     <head>
         <meta charset="utf-8">
+        <title>map heatmap</title>
         <meta description="site de visualisation de pollution sur carte openstreetmap">
-        <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+        <script src="assets/js/jquery-3.2.1.min.js"></script>
+        <script src="assets/js/jquery-ui.min.js"></script>
+        <script src="https://maps.googleapis.com/maps/api/js?v=3&libraries=places&sensor=false"></script>
 <!--        mon style-->
-        <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+        <link rel="stylesheet" type="text/css" href="assets/css/style.css"/>
 <!--        leaflet-->
         <link rel="stylesheet" href="assets/css/leaflet/leaflet.css" />
+<!--        jQuery UI -->
+       <link rel="stylesheet" type="text/css" href="assets/css/jquery-ui.min.css">
         
 
 
@@ -16,12 +21,20 @@
         
     </head>
     <body>
-        <header>
+        <header class="main-header">
             <h1>carte openstreetmap</h1> 
         </header>
         <main>
-            <div id="maLocation">Me Localiser !</div>
-             <section id="maMap"></section>
+            <section class="map-section">
+                <header>
+                    <div id="maLocation">Me Localiser !</div>
+                    <div class="datepicker">
+                        <span>Date début: <input type="text" class="datepicker-debut"></span>
+                        <span>Date fin: <input type="text" class="datepicker-fin"></span>    
+                    </div>
+                </header>
+                <div id="maMap"></div>
+            </section>
         </main>
         <footer>
             <script src="assets/js/leaflet/leaflet.js"></script>
