@@ -153,7 +153,7 @@ function requeteAjax(requestUrl){
     // rquette api
     //http://10.40.73.234:8000/app.php/api/getAll
     var data;
-    $.ajax({
+    jQuery.ajax({
         url : requestUrl, // La ressource ciblée
         type : 'GET', // Le type de la requête HTTP.
         crossDomain: true,
@@ -275,6 +275,13 @@ requeteAjax('http://cgportfolio.ddns.net/api/getAll');
 jQuery('#maLocation').click(function (e) {
     maLocalisation();
 });
+
+  jQuery( function() {
+    jQuery( ".datepicker-debut" ).datepicker();
+    jQuery( ".datepicker-fin" ).datepicker();
+  } );
+
+
 
 // la fonction de recherche
 mapSearch();
