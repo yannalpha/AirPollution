@@ -303,8 +303,8 @@ mapSearch();
 
 // initialisation des datepickers
 jQuery(function() {
-    jQuery(".datepicker-debut").datepicker();
-    jQuery(".datepicker-fin").datepicker();
+    jQuery(".datetimepicker-debut").datetimepicker();
+    jQuery(".datetimepicker-fin").datetimepicker();
     // au clic sur "me localiser"
     jQuery('#maLocation').click(function(e) {
         // localisation 
