@@ -1,14 +1,6 @@
-/// la requette :
-// center --> lat et long
-// delta lat
-// delta long
-// type
-
-
-
-
-
-//////////////////////   configuration de la carte /////////////////////////////
+/******************************************************************************/
+/*********************** configuration de la carte ****************************/
+/******************************************************************************/
 
 //Lattittude et longitude + delta
 var maLat;
@@ -39,7 +31,9 @@ var pfLayerGroup = L.layerGroup();
 
 
 
-// param et création carte
+/******************************************************************************/
+/*********************** initialisation de la carte ***************************/
+/******************************************************************************/
 function initialiserCarte() {
 
     var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
@@ -55,7 +49,7 @@ function initialiserCarte() {
     maLat = 48.5;
     maLng = 2.2;
     
-    //Layers Control
+    /****************************** controle des layers ***************************/
     
     var layerBase = L.tileLayer(osmBase, {attribution: attribution,maxZoom: 50,});
     var layer2 = L.tileLayer(osm2, {attribution: attribution,maxZoom: 50,});
@@ -92,13 +86,25 @@ function initialiserCarte() {
 
     L.control.layers(layerMap, overlayMaps).addTo(objetMap);
 
+    
+    // on initialise les datepickers 
+    jQuery(".datetimepicker-debut").datetimepicker();
+    jQuery(".datetimepicker-fin").datetimepicker();
+    
+    
+    
+    
     // action au event zoom and move
     initActionEvents();
     
 };
 
+/******************************************************************************/
+/**************************** Zoom & move event *******************************/
+/********************* on genere le delta lat et long *************************/
+/******************************************************************************/
 
-//Zoom & move event, on genere le delta lat et long
+
 function initActionEvents(){
     objetMap.on('overlayadd', function(e) {
         if (e.name && e.name == overlayPf) {
@@ -143,14 +149,17 @@ function initActionEvents(){
 };
 
 
-///////////// La requette ajax
+/******************************************************************************/
+/****************************** Requettes ajax ********************************/
+/******************************************************************************/
 function getParticulesFines() {
-    var requestUrl = 'http://cgportfolio.ddns.net/api/getBy' +
-                        '?lat=' + objetMap.getCenter().lat +
-                        '&long=' + objetMap.getCenter().lng +
-                        '&dLat=' + getDeltaLat() +
-                        '&dLong=' + getDeltaLong() + 
-                        '&type=PF';
+    var requestUrl =
+        'http://cgportfolio.ddns.net/api/getBy' +
+        '?lat=' + objetMap.getCenter().lat +
+        '&long=' + objetMap.getCenter().lng +
+        '&dLat=' + getDeltaLat() +
+        '&dLong=' + getDeltaLong() + 
+        '&type=PF';
     // rquette api
     $.ajax({
         url : requestUrl, // La ressource ciblée
@@ -167,12 +176,13 @@ function getParticulesFines() {
 
 ///////////// La requette ajax
 function getCo2() {
-    var requestUrl = 'http://cgportfolio.ddns.net/api/getBy' +
-                        '?lat=' + objetMap.getCenter().lat +
-                        '&long=' + objetMap.getCenter().lng +
-                        '&dLat=' + getDeltaLat() +
-                        '&dLong=' + getDeltaLong() + 
-                        '&type=CO2';
+    var requestUrl = 
+        'http://cgportfolio.ddns.net/api/getBy' +
+        '?lat=' + objetMap.getCenter().lat +
+        '&long=' + objetMap.getCenter().lng +
+        '&dLat=' + getDeltaLat() +
+        '&dLong=' + getDeltaLong() + 
+        '&type=CO2';
     // rquette api
     $.ajax({
         url : requestUrl, // La ressource ciblée
@@ -189,11 +199,12 @@ function getCo2() {
 
 ///////////// La requette ajax
 function getParticulesFinesAndCo2() {
-    var requestUrl = 'http://cgportfolio.ddns.net/api/getBy' +
-                        '?lat=' + objetMap.getCenter().lat +
-                        '&long=' + objetMap.getCenter().lng +
-                        '&dLat=' + getDeltaLat() +
-                        '&dLong=' + getDeltaLong();
+    var requestUrl = 
+        'http://cgportfolio.ddns.net/api/getBy' +
+        '?lat=' + objetMap.getCenter().lat +
+        '&long=' + objetMap.getCenter().lng +
+        '&dLat=' + getDeltaLat() +
+        '&dLong=' + getDeltaLong();
     // rquette api
     $.ajax({
         url : requestUrl, // La ressource ciblée
@@ -209,7 +220,10 @@ function getParticulesFinesAndCo2() {
 };
 
 
-/////////////////////  fonction requette http ///////////////////////
+/******************************************************************************/
+/************************ ajout des données dans calque ***********************/
+/******************************************************************************/
+
 function definitionDonnees(data) {
     
     // variables globales
@@ -235,6 +249,12 @@ function definitionDonnees(data) {
     
 };
 
+
+/******************************************************************************/
+/******************** fonctions de delta lat et long **************************/
+/******************************************************************************/
+
+
 function getDeltaLat() {
     var lattitudeNordEst = objetMap.getBounds()._northEast.lat;
     var lattitudeSouthWest = objetMap.getBounds()._southWest.lat;
@@ -248,7 +268,9 @@ function getDeltaLong() {
 }
 
 
-/// la fonction recherche
+/******************************************************************************/
+/**************************** l'onglet recherche ******************************/
+/******************************************************************************/
 function mapSearch(){
     var search = L.Control.extend({
       onAdd: function() {
@@ -301,27 +323,27 @@ initialiserCarte();
 // la fonction de recherche
 mapSearch();
 
-// initialisation des datepickers
-jQuery(function() {
-    jQuery(".datetimepicker-debut").datetimepicker();
-    jQuery(".datetimepicker-fin").datetimepicker();
-    // au clic sur "me localiser"
-    jQuery('#maLocation').click(function(e) {
+
+/******************************************************************************/
+/******************************* localisation *********************************/
+/******************************************************************************/
+
+jQuery('#maLocation').click(function(e) {
         // localisation 
-        if(navigator.geolocation)
-        {
-            navigator.geolocation.getCurrentPosition(function(position){
-                    maLat = position.coords.latitude;
-                    maLng = position.coords.longitude;
-                    objetMap.flyTo([maLat,maLng], 10);
-                    var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap).bindPopup('Vous ètes ici !').openPopup();
-                    console.log('localisation trouvée, vous etes chanceux!');
-            });
-        }
-        else
-            alert('localisation non accessible');
-    });
+    if(navigator.geolocation)
+    {
+        navigator.geolocation.getCurrentPosition(function(position){
+                maLat = position.coords.latitude;
+                maLng = position.coords.longitude;
+                objetMap.flyTo([maLat,maLng], 10);
+                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap).bindPopup('Vous ètes ici !').openPopup();
+                console.log('localisation trouvée, vous etes chanceux!');
+        });
+    }
+    else
+        alert('localisation non accessible');
 });
+
 
 
 
