@@ -40,7 +40,7 @@ var pfLayerGroup = L.layerGroup();
 
 
 // param et création carte
-function initialiserCarte(){
+function initialiserCarte() {
 
     var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
     
@@ -95,6 +95,51 @@ function initialiserCarte(){
     // action au event zoom and move
     initActionEvents();
     
+};
+
+
+//Zoom & move event, on genere le delta lat et long
+function initActionEvents(){
+    objetMap.on('overlayadd', function(e) {
+        if (e.name && e.name == overlayPf) {
+            isPfActive = true;
+            if (isPfEmpty)
+                getParticulesFines();
+        }
+        else if (e.name && e.name == overlayCo2) {
+            isCo2Active = true;
+            if (isCo2Empty)
+                getCo2();
+        }
+    }).on('overlayremove', function(e) {
+        if (e.name && e.name == overlayPf)
+            isPfActive = false;
+        else if (e.name && e.name == overlayCo2)
+            isCo2Active = false;
+    }).on("moveend", function(){
+
+        if (!isCo2Empty) {
+            co2LayerGroup.eachLayer(function(layer){
+                co2LayerGroup.removeLayer(layer);
+            });
+            isCo2Empty = true;
+        }
+
+        if (!isPfEmpty) {
+            pfLayerGroup.eachLayer(function(layer){
+                pfLayerGroup.removeLayer(layer);
+            });
+            isPfEmpty = true;
+        }
+        
+        if (isCo2Active && isPfActive)
+            getParticulesFinesAndCo2();
+        else if (isCo2Active)
+            getCo2();
+        else if (isPfActive)
+            getParticulesFines();
+
+    });
 };
 
 
@@ -247,51 +292,6 @@ function mapSearch(){
 
     });
 }
-
-
-//Zoom & move event, on genere le delta lat et long
-function initActionEvents(){
-    objetMap.on('overlayadd', function(e) {
-        if (e.name && e.name == overlayPf) {
-            isPfActive = true;
-            if (isPfEmpty)
-                getParticulesFines();
-        }
-        else if (e.name && e.name == overlayCo2) {
-            isCo2Active = true;
-            if (isCo2Empty)
-                getCo2();
-        }
-    }).on('overlayremove', function(e) {
-        if (e.name && e.name == overlayPf)
-            isPfActive = false;
-        else if (e.name && e.name == overlayCo2)
-            isCo2Active = false;
-    }).on("moveend", function(){
-
-        if (!isCo2Empty) {
-            co2LayerGroup.eachLayer(function(layer){
-                co2LayerGroup.removeLayer(layer);
-            });
-            isCo2Empty = true;
-        }
-
-        if (!isPfEmpty) {
-            pfLayerGroup.eachLayer(function(layer){
-                pfLayerGroup.removeLayer(layer);
-            });
-            isPfEmpty = true;
-        }
-        
-        if (isCo2Active && isPfActive)
-            getParticulesFinesAndCo2();
-        else if (isCo2Active)
-            getCo2();
-        else if (isPfActive)
-            getParticulesFines();
-
-    });
-};
 
 
 
