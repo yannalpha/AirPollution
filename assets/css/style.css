@@ -16,10 +16,8 @@
 .leaflet-pane, .leaflet-control-container{
     z-index: 1;
 }
-.map-section header{
-    display: flex;
-    justify-content: space-between;
-}
+
+
 /********************************/
 /*********** general ************/
 /********************************/
@@ -73,6 +71,13 @@ footer{
 #maLocation:hover{
     background-color: #3498db;
 }
+/********** header map *********/
+.map-section header{
+    display: flex;
+    justify-content: space-between;
+    background-color: #2980b9;
+}
+
 /********** Date picker ********/
 
 .datepicker{
@@ -80,6 +85,14 @@ footer{
     align-items: center;
     z-index: 10;
     height: 25px;
+    background-color: #2980b9;
+    color: white;
+}
+
+/********* recherche ***********/
+.recherche{
+    display: flex;
+    align-items: center;
     background-color: #2980b9;
     color: white;
 }
