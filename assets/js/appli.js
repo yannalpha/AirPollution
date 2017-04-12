@@ -9,6 +9,7 @@
 
 
 //////////////////////   configuration de la carte /////////////////////////////
+
 //Lattittude et longitude + delta
 var maLat;
 var maLng;
@@ -83,35 +84,26 @@ function initialiserCarte(){
     
 };
 
-
-
-
-
-//// localisation
-
-function maLocalisation(){
-    // localisation 
-    if(navigator.geolocation)
-    {
-        navigator.geolocation.getCurrentPosition(function(position){
-                maLat = position.coords.latitude;
-                maLng = position.coords.longitude;
-                objetMap.flyTo([maLat,maLng], 10);
-                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap).bindPopup('Vous ètes ici !').openPopup();
-                console.log('localisation trouvée, vous etes chanceux!');
-        });
-
-    }
-    else
-    {
-        alert('localisation non accessible');
-    }  
+///////////// La requette ajax
+function requeteAjax(requestUrl){
+    // rquette api
+    //http://10.40.73.234:8000/app.php/api/getAll
+    var data;
+    $.ajax({
+        url : requestUrl, // La ressource ciblée
+        type : 'GET', // Le type de la requête HTTP.
+        crossDomain: true,
+    //    dataType: 'jsonp'
+    }).done(function(data) {
+        //// on appel la fonction
+        console.log("mes datas :  ")
+        console.log(data);
+        definitionDonnees(data);
+    });
 };
 
 
-
 /////////////////////  fonction requette http ///////////////////////
-
 function definitionDonnees(data) {
     
     // variables globales
@@ -144,31 +136,7 @@ function definitionDonnees(data) {
 };
 
 
-
-
-///////////// La requette ajax
-
-
-function requeteAjax(requestUrl){
-    // rquette api
-    //http://10.40.73.234:8000/app.php/api/getAll
-    var data;
-    $.ajax({
-        url : requestUrl, // La ressource ciblée
-        type : 'GET', // Le type de la requête HTTP.
-        crossDomain: true,
-    //    dataType: 'jsonp'
-    }).done(function(data) {
-        //// on appel la fonction
-        console.log("mes datas :  ")
-        console.log(data);
-        definitionDonnees(data);
-    });
-};
-
-
 /// la fonction recherche
-
 function mapSearch(){
     var search = L.Control.extend({
       onAdd: function() {
@@ -240,11 +208,6 @@ function actionEvent(action){
             pfLayerGroup.removeLayer(layer);
         });
         
-        /*objetMap.eachLayer(function(layer){
-            if (layer._heat)
-                objetMap.removeLayer(layer);
-        });*/
-        
         var requestUrl = 'http://cgportfolio.ddns.net/api/getBy' +
                         '?lat=' + centerMapLat +
                         '&long=' + centerMapLong +
@@ -252,29 +215,14 @@ function actionEvent(action){
                         '&dLong=' + dLong;
         
         requeteAjax(requestUrl);
-        //requeteAjax('http://cgportfolio.ddns.net/api/getAll');
 
     });
 };
 
 
 
-
-
-
-
-
-
 // on initialise la carte
 initialiserCarte();
-
-// on fait la premier requette ajax
-requeteAjax('http://cgportfolio.ddns.net/api/getAll');
-
-// au clic sur "me localiser"
-jQuery('#maLocation').click(function (e) {
-    maLocalisation();
-});
 
 // la fonction de recherche
 mapSearch();
@@ -282,7 +230,22 @@ mapSearch();
 // action au event zoom and move
 actionEvent("moveend");
 
-
+// au clic sur "me localiser"
+jQuery('#maLocation').click(function(e) {
+    // localisation 
+    if(navigator.geolocation)
+    {
+        navigator.geolocation.getCurrentPosition(function(position){
+                maLat = position.coords.latitude;
+                maLng = position.coords.longitude;
+                objetMap.flyTo([maLat,maLng], 10);
+                var maLocalisation = L.marker([maLat, maLng]).addTo(objetMap).bindPopup('Vous ètes ici !').openPopup();
+                console.log('localisation trouvée, vous etes chanceux!');
+        });
+    }
+    else
+        alert('localisation non accessible');
+});
 
 
 
