@@ -88,6 +88,12 @@ footer{
     background-color: #2980b9;
     color: white;
 }
+.datetimepicker-fin{
+    margin-right: 5px;
+}
+.datetimepicker-debut{
+    margin-right: 15px;
+}
 
 /********* recherche ***********/
 .recherche{
@@ -95,4 +101,7 @@ footer{
     align-items: center;
     background-color: #2980b9;
     color: white;
+}
+.recherche input{
+    margin-left: 5px;
 }
