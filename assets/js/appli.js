@@ -172,9 +172,9 @@ function getAirPollutionAjaxRequest(types) {
 
     if (types.length == 2)
         return requestUrl;
-    else if (type[0] == typePf)
+    else if (types[0] == typePf)
         return requestUrl + '&type=' + typePf;
-    else if (type[0] == typeCo2)
+    else if (types[0] == typeCo2)
         return requestUrl + '&type=' + typeCo2;
 }
 
