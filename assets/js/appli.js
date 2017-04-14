@@ -38,21 +38,19 @@ function initialiserCarte() {
 
     var attribution = 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>';
     
-    var osmBase = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
-    var osm2 = 'http://{s}.tile3.opencyclemap.org/landscape/{z}/{x}/{y}.png';
+    var osmBase = 'http://{s}.tile3.opencyclemap.org/landscape/{z}/{x}/{y}.png';
     var osm3 = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
     var osm4 = 'http://{s}.tile.stamen.com/watercolor/{z}/{x}/{y}.jpg';
     var osm5 = 'http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.jpg';
     var osm6 = 'http://tile.stamen.com/toner/{z}/{x}/{y}.png';
     var osm7 = 'http://tile.stamen.com/burningmap/{z}/{x}/{y}.png';
 
-    maLat = 48.5;
-    maLng = 2.2;
-    
+    maLat = 47.6003779;
+    maLng = 3.5299458;
+
     /*************************** controle des layers ***************************/
     
     var layerBase = L.tileLayer(osmBase, {attribution: attribution,maxZoom: 50,});
-    var layer2 = L.tileLayer(osm2, {attribution: attribution,maxZoom: 50,});
     var layer3 = L.tileLayer(osm3, {attribution: attribution,maxZoom: 50,});
     var layer4 = L.tileLayer(osm4, {attribution: attribution,maxZoom: 50,});
     var layer5 = L.tileLayer(osm5, {attribution: attribution,maxZoom: 50,});
@@ -62,7 +60,7 @@ function initialiserCarte() {
 
     objetMap = L.map('maMap', {
         center: [maLat, maLng],
-        zoom: 10,
+        zoom: 16,
         maxZoom: 18,
         minZoom: 3,
         layers: [layerBase]
@@ -70,7 +68,6 @@ function initialiserCarte() {
 
     var layerMap = {
         "greymap": layerBase,
-        "layer2": layer2,
         "layer3": layer3,
         "layer4": layer4,
         "terrain": layer5,
